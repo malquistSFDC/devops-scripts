@@ -14,7 +14,7 @@
  
 # TODO List:
 # - Exception handling if FullCustomLabels.labels-meta.xml does not exist
-# - Remove deleted labels from FullCustomLabels 
+# - Remove deleted labels from FullCustomLabels
 
 import xml.etree.ElementTree as ET 
 
@@ -39,10 +39,9 @@ try:
 
     for new_label in new_label_root:
         full_name = new_label.find('xmlns:fullName', ns).text
-        existing_child = full_tree_root.find(f"./xmlns:labels[@name='{full_name}']", ns)
+        existing_child = full_tree_root.find(f"./xmlns:labels/fullName[.='{full_name}']/..", ns)
         if existing_child is not None:
             full_tree_root.remove(existing_child)
-        new_label.set('name', full_name)
         full_tree_root.append(new_label)
 
     # Format and sort the FullCustomLabel tree.
