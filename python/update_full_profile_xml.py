@@ -57,10 +57,12 @@ for profile in changed_profiles:
 
         changed_profile_elements: list[ET.Element[str]] = []
         for tag in tag_list:
-            changed_profile_elements.append(changed_profile_root.findall(f"xmlns:{tag}", ns))
+            element_with_tag = changed_profile_root.findall(f"xmlns:{tag}", ns)
+            if len(element_with_tag) > 0:
+                changed_profile_elements += element_with_tag
         
         for element in changed_profile_elements:
-            element_tag = element.tag
+            element_tag = element.tag.split('}')[1]
             name_tag = tag_dict[element_tag]
             element_identifier = element.find(f"xmlns:{name_tag}", ns).text
 
@@ -68,6 +70,17 @@ for profile in changed_profiles:
             if element_in_full_tree is not None:
                 full_profile_root.remove(element_in_full_tree)
             full_profile_root.append(element)
+        
+        # Format and sort the FullCustomLabel tree.
+        ET.indent(full_profile_root, space='    ')
+        full_profile_root[:] = sorted(full_profile_root, key = lambda child: child.tag)
+
+        # Write the modified FullCustomLabel tree to its xml file.
+        full_tree_xml_string = ET.tostring(full_profile_root, encoding="unicode", xml_declaration=True)
+        full_tree_xml_string_double_quotes = full_tree_xml_string.replace("'", "\"", 4)
+        with open(full_profile, "wb") as file:
+            file.write(full_tree_xml_string_double_quotes)
+        print(f"Successfully wrote to {full_profile}")
 
     except Exception as e:
         print(e)
