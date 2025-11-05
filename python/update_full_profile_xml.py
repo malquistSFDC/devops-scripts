@@ -46,7 +46,7 @@ changed_profiles = glob.glob("*.profile-meta.xml", root_dir=changed_profiles_dir
 
 for profile in changed_profiles:
     full_profile = f"{full_profiles_dir}/{profile}"
-    changed_profile = f"{full_profiles_dir}/{profile}"
+    changed_profile = f"{changed_profiles_dir}/{profile}"
 
     try:
         full_profile_tree = ET.parse(full_profile)
@@ -61,26 +61,30 @@ for profile in changed_profiles:
             if len(element_with_tag) > 0:
                 changed_profile_elements += element_with_tag
         
+        if len(changed_profile_elements) == 0:
+            raise Exception(f"There are elements to add to {full_profile}")
+
         for element in changed_profile_elements:
             element_tag = element.tag.split('}')[1]
             name_tag = tag_dict[element_tag]
             element_identifier = element.find(f"xmlns:{name_tag}", ns).text
 
-            element_in_full_tree = full_profile_root.find(f"./xmlns:{element_tag}/xmlns:{name_tag}[.='{element_identifier}']", ns)
+            element_in_full_tree = full_profile_root.find(f"./xmlns:{element_tag}/xmlns:{name_tag}[.='{element_identifier}']/..", ns)
             if element_in_full_tree is not None:
                 full_profile_root.remove(element_in_full_tree)
             full_profile_root.append(element)
         
-        # Format and sort the FullCustomLabel tree.
-        ET.indent(full_profile_root, space='    ')
+        # Format and sort the full profile tree.
         full_profile_root[:] = sorted(full_profile_root, key = lambda child: child.tag)
+        ET.indent(full_profile_root, space='    ')
 
-        # Write the modified FullCustomLabel tree to its xml file.
+        # Write the modified profile tree to its xml file.
         full_tree_xml_string = ET.tostring(full_profile_root, encoding="unicode", xml_declaration=True)
         full_tree_xml_string_double_quotes = full_tree_xml_string.replace("'", "\"", 4)
-        with open(full_profile, "wb") as file:
+        with open(full_profile, "w") as file:
             file.write(full_tree_xml_string_double_quotes)
         print(f"Successfully wrote to {full_profile}")
-
+    except ET.ParseError as pe:
+        print(f"Could not parse the modified label tree: {pe}")
     except Exception as e:
         print(e)
