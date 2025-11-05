@@ -52,7 +52,7 @@ try:
     full_tree_xml_string = ET.tostring(full_tree_root, encoding="unicode", xml_declaration=True)
     full_tree_xml_string_double_quotes = full_tree_xml_string.replace("'", "\"", 4)
     full_tree_xml_string_unescape = full_tree_xml_string_double_quotes.replace("'", "&apos;")
-    with open(full_label_md_path, "wb") as file:
+    with open(full_label_md_path, "w") as file:
         file.write(full_tree_xml_string_unescape)
     print(f"Successfully wrote to {full_label_md_path}")
 except ET.ParseError as pe:
