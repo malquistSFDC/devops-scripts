@@ -46,12 +46,14 @@ try:
 
     # Format and sort the FullCustomLabel tree.
     ET.indent(full_tree_root, space='    ')
-    full_tree_root[:] = sorted(full_tree_root, key = lambda child: child.attrib['name'])
+    full_tree_root[:] = sorted(full_tree_root, key = lambda child: child.find("./xmlns:fullName", ns).text)
 
     # Write the modified FullCustomLabel tree to its xml file.
-    full_tree_xml_string = ET.tostring(full_tree_root, encoding="UTF-8", xml_declaration=True)
+    full_tree_xml_string = ET.tostring(full_tree_root, encoding="unicode", xml_declaration=True)
+    full_tree_xml_string_double_quotes = full_tree_xml_string.replace("'", "\"", 4)
+    full_tree_xml_string_unescape = full_tree_xml_string_double_quotes.replace("'", "&apos;")
     with open(full_label_md_path, "wb") as file:
-        file.write(full_tree_xml_string)
+        file.write(full_tree_xml_string_unescape)
     print(f"Successfully wrote to {full_label_md_path}")
 except ET.ParseError as pe:
     print(f"Could not parse the modified label tree: {pe}")
