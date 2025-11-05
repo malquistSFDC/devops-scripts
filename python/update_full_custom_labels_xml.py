@@ -45,8 +45,8 @@ try:
         full_tree_root.append(new_label)
 
     # Format and sort the FullCustomLabel tree.
-    ET.indent(full_tree_root, space='    ')
     full_tree_root[:] = sorted(full_tree_root, key = lambda child: child.find("./xmlns:fullName", ns).text)
+    ET.indent(full_tree_root, space='    ')
 
     # Write the modified FullCustomLabel tree to its xml file.
     full_tree_xml_string = ET.tostring(full_tree_root, encoding="unicode", xml_declaration=True)
