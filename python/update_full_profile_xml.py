@@ -20,4 +20,54 @@ For each modified profile:
         Add new permissions and replace existing permissions
     Write modified full profile tree to full profile xml file.
 """
-print("Pseudocode only")
+import xml.etree.ElementTree as ET
+import glob
+
+xmlns = "http://soap.sforce.com/2006/04/metadata"
+full_profiles_dir = "full-metadata/profiles"
+changed_profiles_dir = "force-app/main/default/profiles" # temporary path
+ns = {'xmlns': xmlns}
+tag_dict = {
+    'applicationVisibilities': 'application',
+    'classAccesses': 'apexClass',
+    'fieldPermissions': 'field',
+    'flowAccesses': 'flow',
+    'layoutAssignments': 'layout',
+    'objectPermissions': 'object',
+    'pageAccesses': 'apexPage',
+    'recordTypeVisibilities': 'recordType',
+    'tabVisibilities': 'tab'
+}
+tag_list = tag_dict.keys()
+
+ET.register_namespace("", xmlns)
+
+changed_profiles = glob.glob("*.profile-meta.xml", root_dir=changed_profiles_dir)
+
+for profile in changed_profiles:
+    full_profile = f"{full_profiles_dir}/{profile}"
+    changed_profile = f"{full_profiles_dir}/{profile}"
+
+    try:
+        full_profile_tree = ET.parse(full_profile)
+        full_profile_root = full_profile_tree.getroot()
+
+        changed_profile_tree = ET.parse(changed_profile)
+        changed_profile_root = changed_profile_tree.getroot()
+
+        changed_profile_elements: list[ET.Element[str]] = []
+        for tag in tag_list:
+            changed_profile_elements.append(changed_profile_root.findall(f"xmlns:{tag}", ns))
+        
+        for element in changed_profile_elements:
+            element_tag = element.tag
+            name_tag = tag_dict[element_tag]
+            element_identifier = element.find(f"xmlns:{name_tag}", ns).text
+
+            element_in_full_tree = full_profile_root.find(f"./xmlns:{element_tag}/xmlns:{name_tag}[.='{element_identifier}']", ns)
+            if element_in_full_tree is not None:
+                full_profile_root.remove(element_in_full_tree)
+            full_profile_root.append(element)
+
+    except Exception as e:
+        print(e)
