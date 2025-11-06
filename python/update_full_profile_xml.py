@@ -22,10 +22,12 @@ For each modified profile:
 """
 # TODO -
 # - Manage Login IP Hours and Login IP Ranges
+# - Manage permission removal
 import xml.etree.ElementTree as ET
 import shutil
 import glob
 
+# --- VARIABLES ---
 xmlns = "http://soap.sforce.com/2006/04/metadata"
 full_profiles_dir = "full-metadata/profiles"
 changed_profiles_dir = "force-app/main/default/profiles" # temporary path
@@ -48,10 +50,14 @@ tag_dict = {
 }
 tag_list = tag_dict.keys()
 
-ET.register_namespace("", xmlns)
-
+# Use glob method to return list of profiles in directory where modified profiles reside
 changed_profiles = glob.glob("*.profile-meta.xml", root_dir=changed_profiles_dir)
 
+ET.register_namespace("", xmlns)
+
+# For each changed profile, add or replace the elements from the profile to its full copy in
+# the full profile directory. If there is no full copy version, copy the profile to the full
+# profile directory.
 for profile in changed_profiles:
     full_profile = f"{full_profiles_dir}/{profile}"
     changed_profile = f"{changed_profiles_dir}/{profile}"
