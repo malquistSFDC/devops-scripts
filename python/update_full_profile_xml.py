@@ -62,11 +62,15 @@ for profile in changed_profiles:
                 changed_profile_elements += element_with_tag
         
         if len(changed_profile_elements) == 0:
-            raise Exception(f"There are elements to add to {full_profile}")
+            raise Exception(f"There are no elements to add to {full_profile}")
 
         for element in changed_profile_elements:
             element_tag = element.tag.split('}')[1]
-            name_tag = tag_dict[element_tag]
+            name_tag = None
+            if element_tag == 'layoutAssignments' and len(element) > 1:
+                name_tag = 'recordType'
+            else:
+                name_tag = tag_dict[element_tag]
             element_identifier = element.find(f"xmlns:{name_tag}", ns).text
 
             element_in_full_tree = full_profile_root.find(f"./xmlns:{element_tag}/xmlns:{name_tag}[.='{element_identifier}']/..", ns)
