@@ -12,6 +12,14 @@
         <readable>true</readable>
     </fieldPermissions>
     <layoutAssignments>
+        <layout>Test_Object__c-Another Layout</layout>
+        <recordType>Test_Object__c.Another_One</recordType>
+    </layoutAssignments>
+    <layoutAssignments>
+        <layout>Test_Object__c-Another Layout</layout>
+        <recordType>Test_Object__c.Test_Record_Type</recordType>
+    </layoutAssignments>
+    <layoutAssignments>
         <layout>Test_Object__c-Test Object Layout</layout>
     </layoutAssignments>
     <objectPermissions>
@@ -23,6 +31,16 @@
         <object>Test_Object__c</object>
         <viewAllRecords>true</viewAllRecords>
     </objectPermissions>
+    <recordTypeVisibilities>
+        <default>false</default>
+        <recordType>Test_Object__c.Another_One</recordType>
+        <visible>true</visible>
+    </recordTypeVisibilities>
+    <recordTypeVisibilities>
+        <default>true</default>
+        <recordType>Test_Object__c.Test_Record_Type</recordType>
+        <visible>true</visible>
+    </recordTypeVisibilities>
     <tabVisibilities>
         <tab>Test_Object__c</tab>
         <visibility>DefaultOn</visibility>
