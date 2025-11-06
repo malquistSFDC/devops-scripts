@@ -44,6 +44,10 @@
         <object>Test_Object__c</object>
         <viewAllRecords>true</viewAllRecords>
     </objectPermissions>
+    <pageAccesses>
+        <apexPage>MyVisualforcePage</apexPage>
+        <enabled>false</enabled>
+    </pageAccesses>
     <recordTypeVisibilities>
         <default>false</default>
         <recordType>Test_Object__c.Another_One</recordType>
