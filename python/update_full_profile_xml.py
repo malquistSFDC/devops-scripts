@@ -55,17 +55,27 @@ for profile in changed_profiles:
         changed_profile_tree = ET.parse(changed_profile)
         changed_profile_root = changed_profile_tree.getroot()
 
+        # Create list of elements from profile whose tags are listed in the tag list
         changed_profile_elements: list[ET.Element[str]] = []
         for tag in tag_list:
             element_with_tag = changed_profile_root.findall(f"xmlns:{tag}", ns)
             if len(element_with_tag) > 0:
                 changed_profile_elements += element_with_tag
-        
+
+        # If no elements are found, throw an exception
         if len(changed_profile_elements) == 0:
             raise Exception(f"There are no elements to add to {full_profile}")
 
+        # For each element in the changed_profile_elements tree, check if the element is
+        # in the full profile tree. If true, replace the element in the full tree with the
+        # updated version of the element. Otherwise, add the element to the full tree.
         for element in changed_profile_elements:
             element_tag = element.tag.split('}')[1]
+
+            # Set the element identifier. For layoutAssignments, the format will vary if
+            # a record type is being assigned to the layout. Use the recordType tag as the
+            # identifier if the layoutAssignment element contains a recordType tag. Otherwise,
+            # use the layout tag.
             name_tag = None
             if element_tag == 'layoutAssignments' and len(element) > 1:
                 name_tag = 'recordType'
