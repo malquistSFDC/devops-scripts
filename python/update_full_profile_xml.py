@@ -23,6 +23,7 @@ For each modified profile:
 # TODO -
 # - Manage Login IP Hours and Login IP Ranges
 import xml.etree.ElementTree as ET
+import shutil
 import glob
 
 xmlns = "http://soap.sforce.com/2006/04/metadata"
@@ -106,6 +107,13 @@ for profile in changed_profiles:
             file.write(full_tree_xml_string_double_quotes)
         print(f"Successfully wrote to {full_profile}")
     except ET.ParseError as pe:
-        print(f"Could not parse the modified label tree: {pe}")
+        print(f"Could not parse the modified label tree: {pe.with_traceback()}")
+    except FileNotFoundError as fnfe:
+        missing_filepath: str = fnfe.filename
+        if missing_filepath.find(full_profiles_dir) >= 0:
+            shutil.copyfile(changed_profile, full_profile)
+            print(f"{missing_filepath} does not exist. Creating copy from force-app...")
+        else:
+            print(f"Could not find file {missing_filepath}: {fnfe.with_traceback()}")
     except Exception as e:
-        print(e)
+        print(f"Got error type {type(e)}: {e.with_traceback()}")
