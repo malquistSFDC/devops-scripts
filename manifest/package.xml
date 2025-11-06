@@ -1,11 +1,16 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <Package xmlns="http://soap.sforce.com/2006/04/metadata">
     <types>
-        <members>MyVisualforcePage</members>
-        <name>ApexPage</name>
+        <members>Test_Object__c</members>
+        <name>CustomObject</name>
+    </types>
+    <types>
+        <members>Test_Object__c-Test Object Layout</members>
+        <name>Layout</name>
     </types>
     <types>
         <members>TestAdmin</members>
+        <members>Test Standard</members>
         <name>Profile</name>
     </types>
     <version>65.0</version>

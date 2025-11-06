@@ -29,11 +29,11 @@
         <recordType>Test_Object__c.Another_One</recordType>
     </layoutAssignments>
     <layoutAssignments>
-        <layout>Test_Object__c-Another Layout</layout>
-        <recordType>Test_Object__c.Test_Record_Type</recordType>
+        <layout>Test_Object__c-Test Object Layout</layout>
     </layoutAssignments>
     <layoutAssignments>
         <layout>Test_Object__c-Test Object Layout</layout>
+        <recordType>Test_Object__c.Test_Record_Type</recordType>
     </layoutAssignments>
     <objectPermissions>
         <allowCreate>true</allowCreate>

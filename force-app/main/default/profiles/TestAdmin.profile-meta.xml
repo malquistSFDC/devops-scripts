@@ -1,10 +1,42 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Profile xmlns="http://soap.sforce.com/2006/04/metadata">
     <custom>true</custom>
-    <pageAccesses>
-        <apexPage>MyVisualforcePage</apexPage>
-        <enabled>false</enabled>
-    </pageAccesses>
+    <fieldPermissions>
+        <editable>true</editable>
+        <field>Test_Object__c.Is_Checked__c</field>
+        <readable>true</readable>
+    </fieldPermissions>
+    <fieldPermissions>
+        <editable>true</editable>
+        <field>Test_Object__c.Message__c</field>
+        <readable>true</readable>
+    </fieldPermissions>
+    <layoutAssignments>
+        <layout>Test_Object__c-Test Object Layout</layout>
+    </layoutAssignments>
+    <layoutAssignments>
+        <layout>Test_Object__c-Test Object Layout</layout>
+        <recordType>Test_Object__c.Test_Record_Type</recordType>
+    </layoutAssignments>
+    <objectPermissions>
+        <allowCreate>true</allowCreate>
+        <allowDelete>true</allowDelete>
+        <allowEdit>true</allowEdit>
+        <allowRead>true</allowRead>
+        <modifyAllRecords>true</modifyAllRecords>
+        <object>Test_Object__c</object>
+        <viewAllRecords>true</viewAllRecords>
+    </objectPermissions>
+    <recordTypeVisibilities>
+        <default>false</default>
+        <recordType>Test_Object__c.Another_One</recordType>
+        <visible>true</visible>
+    </recordTypeVisibilities>
+    <recordTypeVisibilities>
+        <default>true</default>
+        <recordType>Test_Object__c.Test_Record_Type</recordType>
+        <visible>true</visible>
+    </recordTypeVisibilities>
     <userLicense>Salesforce</userLicense>
     <userPermissions>
         <enabled>true</enabled>
