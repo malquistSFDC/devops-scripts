@@ -42,7 +42,8 @@ tag_dict = {
     'objectPermissions': 'object',
     'pageAccesses': 'apexPage',
     'recordTypeVisibilities': 'recordType',
-    'tabVisibilities': 'tab'
+    'tabVisibilities': 'tab',
+    'userPermissions': 'name'
 }
 tag_list = tag_dict.keys()
 
