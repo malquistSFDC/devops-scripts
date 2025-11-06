@@ -15,6 +15,10 @@
         <field>Test_Object__c.Message__c</field>
         <readable>true</readable>
     </fieldPermissions>
+    <flowAccesses>
+        <enabled>true</enabled>
+        <flow>My_Awesome_Flow</flow>
+    </flowAccesses>
     <layoutAssignments>
         <layout>Test_Object__c-Another Layout</layout>
         <recordType>Test_Object__c.Another_One</recordType>
