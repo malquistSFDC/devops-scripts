@@ -20,6 +20,8 @@ For each modified profile:
         Add new permissions and replace existing permissions
     Write modified full profile tree to full profile xml file.
 """
+# TODO -
+# - Manage Login IP Hours and Login IP Ranges
 import xml.etree.ElementTree as ET
 import glob
 
@@ -30,6 +32,10 @@ ns = {'xmlns': xmlns}
 tag_dict = {
     'applicationVisibilities': 'application',
     'classAccesses': 'apexClass',
+    'customMetadataTypeAccesses': 'name',
+    'customPermissions': 'name',
+    'customSettingAccesses': 'name',
+    'externalDataSourceAccesses': 'externalDataSource',
     'fieldPermissions': 'field',
     'flowAccesses': 'flow',
     'layoutAssignments': 'layout',
