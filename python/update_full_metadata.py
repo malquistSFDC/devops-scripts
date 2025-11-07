@@ -16,6 +16,22 @@ import xml.etree.ElementTree as ET
 import shutil
 import glob
 
+def create_element_map(element: ET.Element[str], tag_dict: dict[str, str]):
+    element_tag = element.tag.split('}')[1]
+    name_tag = tag_dict[element_tag]
+    if element.tag == 'layoutAssignments' and len(element) > 1:
+        name_tag = 'recordType'
+    element_identifier = element.find(f"xmlns:{name_tag}", ns).text
+    return (element_tag, element_identifier)
+
+def create_tree_dict_with_keys(tag_dict, tag_list, element_tree):
+    filtered_metadata_elements: list[ET.Element[str]] = \
+                filter(lambda element: element.tag.split('}')[1] in tag_list, element_tree.findall("."))
+    metadata_dict: dict[(str, str), ET.Element[str]] = \
+                {create_element_map(element, tag_dict): element for element in filtered_metadata_elements}
+    metadata_keys = set(metadata_dict.keys())
+    return metadata_dict, metadata_keys
+
 # --- VARIABLES ---
 xmlns = "http://soap.sforce.com/2006/04/metadata"
 full_metadata_root_dir = "full-metadata"
@@ -57,6 +73,7 @@ metadata_dict = {
 metadata_list = metadata_dict.keys()
 
 ET.register_namespace("", xmlns)
+
 for metadata_type in metadata_list:
     changed_metadata_dir = f"{changed_metadata_root_dir}/{metadata_type}"
     full_metadata_dir = f"{full_metadata_root_dir}/{metadata_type}"
@@ -79,36 +96,19 @@ for metadata_type in metadata_list:
             changed_metadata_tree = ET.parse(changed_metadata)
             changed_metadata_root = changed_metadata_tree.getroot()
 
-            # Create list of elements from profile whose tags are listed in the tag list
-            changed_profile_elements: list[ET.Element[str]] = []
-            for tag in tag_list:
-                element_with_tag = changed_metadata_root.findall(f"xmlns:{tag}", ns)
-                if len(element_with_tag) > 0:
-                    changed_profile_elements += element_with_tag
+            # For both metadata trees, create a dictionary where the key is a tuple that contains the identifying tag
+            # and the text in the identifying tag, and the value is the element. This strategy reduces the number of calls
+            # to search the full metadata tree.
+            full_metadata_dict, full_metadata_keys = create_tree_dict_with_keys(tag_dict, tag_list, full_metadata_root)
+            changed_metadata_dict, changed_metadata_keys = create_tree_dict_with_keys(tag_dict, tag_list, changed_metadata_root)
+            
+            # Find elements that are in both metadata trees.
+            elements_modified = full_metadata_keys.intersection(changed_metadata_keys)
 
-            # If no elements are found, throw an exception
-            if len(changed_profile_elements) == 0:
-                raise Exception(f"There are no elements to add to {full_metadata}")
-
-            # For each element in the changed_profile_elements tree, check if the element is
-            # in the full profile tree. If true, replace the element in the full tree with the
-            # updated version of the element. Otherwise, add the element to the full tree.
-            for element in changed_profile_elements:
-                element_tag = element.tag.split('}')[1]
-
-                # Set the element identifier. For layoutAssignments, the format will vary if
-                # a record type is being assigned to the layout. Use the recordType tag as the
-                # identifier if the layoutAssignment element contains a recordType tag. Otherwise,
-                # use the layout tag.
-                name_tag = tag_dict[element_tag]
-                if metadata_type == 'profiles' and element_tag == 'layoutAssignments' and len(element) > 1:
-                    name_tag = 'recordType'
-                element_identifier = element.find(f"xmlns:{name_tag}", ns).text
-
-                element_in_full_tree = full_metadata_root.find(f"./xmlns:{element_tag}/xmlns:{name_tag}[.='{element_identifier}']/..", ns)
-                if element_in_full_tree is not None:
-                    full_metadata_root.remove(element_in_full_tree)
-                full_metadata_root.append(element)
+            for element_tuple in changed_metadata_keys:
+                if element_tuple in elements_modified:
+                    full_metadata_root.remove(full_metadata_dict[element_tuple])
+                full_metadata_root.append(changed_metadata_dict[element_tuple])
             
             # Format and sort the full profile tree.
             full_metadata_root[:] = sorted(full_metadata_root, key = lambda child: child.tag)
