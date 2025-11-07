@@ -74,6 +74,17 @@ metadata_list = metadata_dict.keys()
 
 ET.register_namespace("", xmlns)
 
+def write_to_full_metadata_file(filepath, element_tree):
+    element_tree[:] = sorted(element_tree, key = lambda child: child.tag)
+    ET.indent(element_tree, space='    ')
+
+    # Write the modified profile tree to its xml file.
+    xml_string = ET.tostring(element_tree, encoding="unicode", xml_declaration=True)
+    xml_string_header_fix = xml_string.replace("'", "\"", 4)
+    with open(filepath, "w") as file:
+        file.write(xml_string_header_fix)
+    print(f"Successfully wrote to {filepath}")
+
 for metadata_type in metadata_list:
     changed_metadata_dir = f"{changed_metadata_root_dir}/{metadata_type}"
     full_metadata_dir = f"{full_metadata_root_dir}/{metadata_type}"
@@ -105,26 +116,19 @@ for metadata_type in metadata_list:
             # Find elements that are in both metadata trees.
             elements_modified = full_metadata_keys.intersection(changed_metadata_keys)
 
+            # Add elements from incoming metadata to full metadata.
             for element_tuple in changed_metadata_keys:
                 if element_tuple in elements_modified:
                     full_metadata_root.remove(full_metadata_dict[element_tuple])
                 full_metadata_root.append(changed_metadata_dict[element_tuple])
             
             # Format and sort the full profile tree.
-            full_metadata_root[:] = sorted(full_metadata_root, key = lambda child: child.tag)
-            ET.indent(full_metadata_root, space='    ')
-
-            # Write the modified profile tree to its xml file.
-            full_tree_xml_string = ET.tostring(full_metadata_root, encoding="unicode", xml_declaration=True)
-            full_tree_xml_string_double_quotes = full_tree_xml_string.replace("'", "\"", 4)
-            with open(full_metadata, "w") as file:
-                file.write(full_tree_xml_string_double_quotes)
-            print(f"Successfully wrote to {full_metadata}")
+            write_to_full_metadata_file(full_metadata, full_metadata_root)
         except ET.ParseError as pe:
             print(f"Could not parse the modified label tree: {pe.with_traceback()}")
         except FileNotFoundError as fnfe:
             missing_filepath: str = fnfe.filename
-            if missing_filepath.find(full_metadata_dir) >= 0:
+            if missing_filepath == full_metadata:
                 shutil.copyfile(changed_metadata, full_metadata)
                 print(f"{missing_filepath} does not exist. Creating copy from force-app...")
             else:
