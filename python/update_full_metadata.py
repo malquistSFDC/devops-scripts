@@ -1,6 +1,17 @@
+"""
+This script maintains all full copies of the following metadata types:
+- Profiles
+- SharingRules
+- CustomLabels
+Each metadata file in 'changed_metadata_root_dir' that is one of the above types is parsed
+to an ElementTree and compared to its corresponding full metadata file in 'full_metadata_root_dir', 
+which is stored separately from the Salesforce project directory.
+The full version of the metadata file is updated with new or modified elements.
+"""
+
 # TODO -
 # - Manage Login IP Hours and Login IP Ranges
-# - Manage permission removal
+# - Manage element removal
 import xml.etree.ElementTree as ET
 import shutil
 import glob
