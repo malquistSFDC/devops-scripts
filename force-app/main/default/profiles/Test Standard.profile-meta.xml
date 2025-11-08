@@ -1,8 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Profile xmlns="http://soap.sforce.com/2006/04/metadata">
+    <classAccesses>
+        <apexClass>MyApexClass</apexClass>
+        <enabled>true</enabled>
+    </classAccesses>
     <custom>true</custom>
     <fieldPermissions>
-        <editable>false</editable>
+        <editable>true</editable>
         <field>Test_Object__c.Is_Checked__c</field>
         <readable>true</readable>
     </fieldPermissions>
@@ -12,15 +16,15 @@
         <readable>true</readable>
     </fieldPermissions>
     <layoutAssignments>
-        <layout>Test_Object__c-Test Object Layout</layout>
-    </layoutAssignments>
-    <layoutAssignments>
-        <layout>Test_Object__c-Test Object Layout</layout>
+        <layout>Test_Object__c-Another Layout</layout>
         <recordType>Test_Object__c.Another_One</recordType>
     </layoutAssignments>
     <layoutAssignments>
-        <layout>Test_Object__c-Test Object Layout</layout>
+        <layout>Test_Object__c-Another Layout</layout>
         <recordType>Test_Object__c.Test_Record_Type</recordType>
+    </layoutAssignments>
+    <layoutAssignments>
+        <layout>Test_Object__c-Test Object Layout</layout>
     </layoutAssignments>
     <objectPermissions>
         <allowCreate>false</allowCreate>

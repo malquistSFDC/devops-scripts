@@ -1,5 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Profile xmlns="http://soap.sforce.com/2006/04/metadata">
+    <classAccesses>
+        <apexClass>MyApexClass</apexClass>
+        <enabled>true</enabled>
+    </classAccesses>
     <custom>true</custom>
     <fieldPermissions>
         <editable>true</editable>
@@ -13,6 +17,10 @@
     </fieldPermissions>
     <layoutAssignments>
         <layout>Test_Object__c-Test Object Layout</layout>
+    </layoutAssignments>
+    <layoutAssignments>
+        <layout>Test_Object__c-Test Object Layout</layout>
+        <recordType>Test_Object__c.Another_One</recordType>
     </layoutAssignments>
     <layoutAssignments>
         <layout>Test_Object__c-Test Object Layout</layout>

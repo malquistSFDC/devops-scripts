@@ -25,11 +25,11 @@
         <flow>My_Awesome_Flow</flow>
     </flowAccesses>
     <layoutAssignments>
-        <layout>Test_Object__c-Another Layout</layout>
-        <recordType>Test_Object__c.Another_One</recordType>
+        <layout>Test_Object__c-Test Object Layout</layout>
     </layoutAssignments>
     <layoutAssignments>
         <layout>Test_Object__c-Test Object Layout</layout>
+        <recordType>Test_Object__c.Another_One</recordType>
     </layoutAssignments>
     <layoutAssignments>
         <layout>Test_Object__c-Test Object Layout</layout>
