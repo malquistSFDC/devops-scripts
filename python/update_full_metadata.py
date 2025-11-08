@@ -12,25 +12,11 @@ The full version of the metadata file is updated with new or modified elements.
 # TODO -
 # - Manage Login IP Hours and Login IP Ranges
 # - Manage element removal
+
 import xml.etree.ElementTree as ET
 import shutil
+import traceback
 import glob
-
-def create_element_map(element: ET.Element[str], tag_dict: dict[str, str]):
-    element_tag = element.tag.split('}')[1]
-    name_tag = tag_dict[element_tag]
-    if element.tag == 'layoutAssignments' and len(element) > 1:
-        name_tag = 'recordType'
-    element_identifier = element.find(f"xmlns:{name_tag}", ns).text
-    return (element_tag, element_identifier)
-
-def create_tree_dict_with_keys(tag_dict, tag_list, element_tree):
-    filtered_metadata_elements: list[ET.Element[str]] = \
-                filter(lambda element: element.tag.split('}')[1] in tag_list, element_tree.findall("."))
-    metadata_dict: dict[(str, str), ET.Element[str]] = \
-                {create_element_map(element, tag_dict): element for element in filtered_metadata_elements}
-    metadata_keys = set(metadata_dict.keys())
-    return metadata_dict, metadata_keys
 
 # --- VARIABLES ---
 xmlns = "http://soap.sforce.com/2006/04/metadata"
@@ -72,10 +58,39 @@ metadata_dict = {
 }
 metadata_list = metadata_dict.keys()
 
-ET.register_namespace("", xmlns)
+# --- FUNCTIONS ---
+def create_element_map(element: ET.Element[str], tag_dict: dict[str, str]):
+    element_tag = element.tag.split('}')[1]
+    if element_tag not in tag_dict:
+        return (element_tag, "") 
+    try:
+        name_tag = tag_dict[element_tag]
+        if element_tag == 'layoutAssignments' and len(element) > 1:
+            name_tag = 'recordType'
+        element_identifier_node = element.find(f"xmlns:{name_tag}", ns)
+        if element_identifier_node is None or element_identifier_node.text is None:
+            print(f"Warning: Malformed element <{element_tag}> in {element.sourceline} is missing its identifier <{name_tag}>. Skipping.")
+            raise ValueError(f"Malformed element <{element_tag}>")
+        return (element_tag, element_identifier_node.text)
+    except Exception as e:
+        print(f"Warning: Error processing element {element_tag}: {e}")
+        return (element_tag, "")
 
-def write_to_full_metadata_file(filepath, element_tree):
-    element_tree[:] = sorted(element_tree, key = lambda child: child.tag)
+def create_tree_dict_with_keys(tag_dict, tag_list, element_tree):
+    metadata_dict: dict[(str, str), ET.Element[str]] = {}
+    for element in element_tree.findall("*"):
+        if element.tag.split('}')[1] in tag_list:
+            try:
+                key = create_element_map(element, tag_dict)
+                metadata_dict[key] = element
+            except ValueError as ve:
+                print(f"Skipping element due to error")
+                traceback.print_exception(ve, limit=2)
+    metadata_keys = set(metadata_dict.keys())
+    return metadata_dict, metadata_keys
+
+def write_to_full_metadata_file(filepath, element_tree, tag_dict):
+    element_tree[:] = sorted(element_tree, key = lambda child: create_element_map(child, tag_dict))
     ET.indent(element_tree, space='    ')
 
     # Write the modified profile tree to its xml file.
@@ -84,6 +99,9 @@ def write_to_full_metadata_file(filepath, element_tree):
     with open(filepath, "w") as file:
         file.write(xml_string_header_fix)
     print(f"Successfully wrote to {filepath}")
+
+# --- MAIN ---
+ET.register_namespace("", xmlns)
 
 for metadata_type in metadata_list:
     changed_metadata_dir = f"{changed_metadata_root_dir}/{metadata_type}"
@@ -112,6 +130,10 @@ for metadata_type in metadata_list:
             # to search the full metadata tree.
             full_metadata_dict, full_metadata_keys = create_tree_dict_with_keys(tag_dict, tag_list, full_metadata_root)
             changed_metadata_dict, changed_metadata_keys = create_tree_dict_with_keys(tag_dict, tag_list, changed_metadata_root)
+
+            if len(changed_metadata_dict) == 0:
+                print(f"No changes to {changed_metadata}. Skipping...")
+                continue
             
             # Find elements that are in both metadata trees.
             elements_modified = full_metadata_keys.intersection(changed_metadata_keys)
@@ -123,15 +145,16 @@ for metadata_type in metadata_list:
                 full_metadata_root.append(changed_metadata_dict[element_tuple])
             
             # Format and sort the full profile tree.
-            write_to_full_metadata_file(full_metadata, full_metadata_root)
+            write_to_full_metadata_file(full_metadata, full_metadata_root, tag_dict)
         except ET.ParseError as pe:
-            print(f"Could not parse the modified label tree: {pe.with_traceback()}")
+            print(f"Could not parse the modified label tree: {pe}")
+            traceback.print_exception(pe, limit=2)
         except FileNotFoundError as fnfe:
             missing_filepath: str = fnfe.filename
             if missing_filepath == full_metadata:
                 shutil.copyfile(changed_metadata, full_metadata)
                 print(f"{missing_filepath} does not exist. Creating copy from force-app...")
             else:
-                print(f"Could not find file {missing_filepath}: {fnfe.with_traceback()}")
+                traceback.print_exception(fnfe, limit=2)
         except Exception as e:
-            print(f"Got error type {type(e)}: {e.with_traceback()}")
+            traceback.print_exception(e, limit=2)
