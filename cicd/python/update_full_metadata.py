@@ -17,45 +17,31 @@ import xml.etree.ElementTree as ET
 import shutil
 import traceback
 import glob
+import json
+import sys
 
 # --- VARIABLES ---
 xmlns = "http://soap.sforce.com/2006/04/metadata"
 full_metadata_root_dir = "full-metadata"
 changed_metadata_root_dir = "force-app/main/default" # temporary path
 ns = {'xmlns': xmlns}
-metadata_dict = {
-    'profiles': {
-        'fileGlob': '*.profile-meta.xml',
-        'tags': {
-            'applicationVisibilities': 'application',
-            'classAccesses': 'apexClass',
-            'customMetadataTypeAccesses': 'name',
-            'customPermissions': 'name',
-            'customSettingAccesses': 'name',
-            'externalDataSourceAccesses': 'externalDataSource',
-            'fieldPermissions': 'field',
-            'flowAccesses': 'flow',
-            'layoutAssignments': 'layout',
-            'objectPermissions': 'object',
-            'pageAccesses': 'apexPage',
-            'recordTypeVisibilities': 'recordType',
-            'tabVisibilities': 'tab',
-            'userPermissions': 'name'
-        }
-    },
-    'labels': {
-        'fileGlob': '*.labels-meta.xml',
-        'tags': {
-            'labels': 'fullName'
-        }
-    },
-    'sharingRules': {
-        'fileGlob': '*.sharingRules-meta.xml',
-        'tags': {
-            'sharingCriteriaRules': 'fullName'
-        }
-    }
-}
+metadata_config_file = "cicd/config/metadata_config.json"
+
+#--- Load metadata configuration file from JSON
+metadata_dict = None
+try:
+    with open(metadata_config_file, 'r') as json_file:
+        metadata_dict = json.load(json_file)
+except FileNotFoundError:
+    print(f"Could not find {metadata_config_file}")
+    sys.exit(1)
+except json.JSONDecodeError:
+    print(f"Could not parse {metadata_config_file}. Please check for valid JSON.")
+    sys.exit(1)
+except Exception as e:
+    print(f"An unexpected error has occured when loading {metadata_config_file}!")
+    traceback.print_exception(e, limit=2)
+    sys.exit(1)
 metadata_list = metadata_dict.keys()
 
 # --- FUNCTIONS ---

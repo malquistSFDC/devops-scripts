@@ -1,0 +1,33 @@
+{
+  "profiles": {
+    "fileGlob": "*.profile-meta.xml",
+    "tags": {
+      "applicationVisibilities": "application",
+      "classAccesses": "apexClass",
+      "customMetadataTypeAccesses": "name",
+      "customPermissions": "name",
+      "customSettingAccesses": "name",
+      "externalDataSourceAccesses": "externalDataSource",
+      "fieldPermissions": "field",
+      "flowAccesses": "flow",
+      "layoutAssignments": "layout",
+      "objectPermissions": "object",
+      "pageAccesses": "apexPage",
+      "recordTypeVisibilities": "recordType",
+      "tabVisibilities": "tab",
+      "userPermissions": "name"
+    }
+  },
+  "labels": {
+    "fileGlob": "*.labels-meta.xml",
+    "tags": {
+      "labels": "fullName"
+    }
+  },
+  "sharingRules": {
+    "fileGlob": "*.sharingRules-meta.xml",
+    "tags": {
+      "sharingCriteriaRules": "fullName"
+    }
+  }
+}
