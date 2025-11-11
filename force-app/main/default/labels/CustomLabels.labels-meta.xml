@@ -9,7 +9,7 @@
     </labels>
     <labels>
         <fullName>quoteAuto</fullName>
-        <value>This is an automatically generated quote.</value>
+        <value>This is an automatically generated quote with a correction.</value>
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>Automatic Quote</shortDescription>
